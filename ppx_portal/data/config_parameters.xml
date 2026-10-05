@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!--
+    The three values that point this Odoo at a Payment Portal Express account.
+    They live in System Parameters because a data module cannot add a settings
+    page: that needs Python, and Python is what keeps it out of Odoo Online.
+    Settings > Payment Portal Express opens them directly.
+
+    noupdate="1" so that upgrading the module never overwrites what a customer
+    entered here.
+  -->
+  <data noupdate="1">
+
+    <!-- The account's short name, from the portal's Accounts page, e.g. "acme".
+         Set this before using the buttons; everything else has a usable default. -->
+    <record id="param_tenant_slug" model="ir.config_parameter">
+      <field name="key">ppx.tenant_slug</field>
+      <field name="value"></field>
+    </record>
+
+    <!-- Where the portal runs. Only change this if Payment Portal Express has
+         given you a different address. -->
+    <record id="param_portal_host" model="ir.config_parameter">
+      <field name="key">ppx.portal_host</field>
+      <field name="value">paymentportalexpress.com</field>
+    </record>
+
+    <!-- "production" charges real cards. "sandbox" uses the test credentials
+         configured on the account, for trying the flow end to end. -->
+    <record id="param_environment" model="ir.config_parameter">
+      <field name="key">ppx.environment</field>
+      <field name="value">production</field>
+    </record>
+
+  </data>
+</odoo>

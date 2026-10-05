@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+    <!--
+      The buttons.
+
+      Both are added to the END of the form header rather than beside a named
+      neighbour. Anchoring to another button ties the module to that button
+      still existing under that name, which is how the first hand-built version
+      of this broke on an Odoo upgrade.
+
+      The invoice button hides itself unless the record is a posted customer
+      invoice, so it never appears somewhere it would only produce an error.
+    -->
+
+    <record id="view_move_form_ppx_button" model="ir.ui.view">
+      <field name="name">account.move.form.ppx.pay</field>
+      <field name="model">account.move</field>
+      <field name="inherit_id" ref="account.view_move_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//header" position="inside">
+          <button name="%(action_pay_invoice)d"
+                  string="Pay via Portal"
+                  type="action"
+                  class="btn-secondary"
+                  invisible="state != 'posted' or move_type != 'out_invoice'"/>
+        </xpath>
+      </field>
+    </record>
+
+    <!--
+      res.partner's form has no header of its own, so one is added before the
+      sheet. Odoo renders an empty header as a thin strip, which is why this is
+      the whole header rather than a button appended to something existing.
+    -->
+    <record id="view_partner_form_ppx_button" model="ir.ui.view">
+      <field name="name">res.partner.form.ppx.pay</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="base.view_partner_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//sheet" position="before">
+          <header>
+            <button name="%(action_pay_customer)d"
+                    string="Pay via Portal"
+                    type="action"
+                    class="btn-secondary"
+                    invisible="not customer_rank"/>
+          </header>
+        </xpath>
+      </field>
+    </record>
+
+  </data>
+</odoo>

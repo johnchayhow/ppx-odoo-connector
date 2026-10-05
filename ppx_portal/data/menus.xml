@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+    <!--
+      Where a customer configures this.
+
+      A data module cannot add a proper Settings page, so the three System
+      Parameters are surfaced directly under Settings, filtered to ours. Without
+      this they sit in Technical > System Parameters among hundreds of rows,
+      which is not somewhere anyone should be sent to type an account name.
+    -->
+    <record id="action_settings" model="ir.actions.act_window">
+      <field name="name">Payment Portal Express</field>
+      <field name="res_model">ir.config_parameter</field>
+      <field name="view_mode">list,form</field>
+      <field name="domain">[('key', 'like', 'ppx.%')]</field>
+      <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">Set your portal account name</p>
+        <p>
+          <b>ppx.tenant_slug</b> is the account's short name, from the Accounts
+          page of your Payment Portal Express admin, for example "acme".<br/>
+          <b>ppx.environment</b> is "production" to charge real cards, or
+          "sandbox" to test with test credentials.<br/>
+          <b>ppx.portal_host</b> only changes if you have been given a different
+          portal address.
+        </p>
+      </field>
+    </record>
+
+    <menuitem id="menu_ppx_root"
+              name="Payment Portal Express"
+              parent="base.menu_administration"
+              sequence="90"/>
+
+    <menuitem id="menu_ppx_settings"
+              name="Settings"
+              parent="menu_ppx_root"
+              action="action_settings"
+              sequence="10"/>
+
+    <menuitem id="menu_ppx_finish_setup"
+              name="Finish setup"
+              parent="menu_ppx_root"
+              action="action_finish_setup"
+              sequence="20"/>
+
+  </data>
+</odoo>

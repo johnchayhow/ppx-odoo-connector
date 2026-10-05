@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+    <!--
+      "Finish setup".
+
+      Two things cannot ship as data, because they depend on accounts that only
+      exist once a customer has their own chart of accounts:
+
+        1. The Outstanding Receipts account on each bank journal's manual
+           payment method line. Without it a payment recorded by the portal
+           cannot be posted, and the trouble shows up later as a payment that
+           will not reconcile, a long way from its cause.
+
+        2. A payment provider for saved cards, so a card a customer chooses to
+           save has somewhere to live. Nothing is charged through it: the charge
+           happens at the payment processor, and this record only holds the
+           reference.
+
+      Run it once after installing. Safe to run again: it reports what was
+      already there and only fills in what is missing.
+
+      It reports through a notification rather than by raising. Raising would
+      roll the transaction back and undo the very configuration just made.
+    -->
+    <record id="action_finish_setup" model="ir.actions.server">
+      <field name="name">Payment Portal Express: Finish setup</field>
+      <field name="model_id" ref="base.model_ir_config_parameter"/>
+      <field name="state">code</field>
+      <field name="code"><![CDATA[
+notes = []
+
+for company in env['res.company'].search([]):
+    # with_company scopes the searches below to this company, so the module
+    # does not have to know which field names carry company ownership in this
+    # Odoo version -- they have changed more than once.
+    journals = env['account.journal'].with_company(company).search([
+        ('type', '=', 'bank'), ('company_id', '=', company.id),
+    ])
+
+    # Odoo's own Outstanding Receipts account, by name or by its usual code.
+    outstanding = env['account.account'].with_company(company).search([
+        '|', ('name', 'ilike', 'outstanding receipt'), ('code', '=like', '1011%'),
+    ], limit=1)
+
+    for journal in journals:
+        lines = journal.inbound_payment_method_line_ids.filtered(
+            lambda line: line.code == 'manual' and not line.payment_account_id
+        )
+        if not lines:
+            continue
+        if not outstanding:
+            notes.append("%s / %s: no Outstanding Receipts account found - set one by hand"
+                         % (company.name, journal.name))
+            continue
+        lines.write({'payment_account_id': outstanding.id})
+        notes.append("%s / %s: payments will post to %s"
+                     % (company.name, journal.name, outstanding.display_name))
+
+    provider = env['payment.provider'].search([
+        ('name', '=', 'Payment Portal Express'), ('company_id', '=', company.id),
+    ], limit=1)
+    if provider:
+        notes.append("%s: card storage already in place" % company.name)
+        continue
+
+    bank_journal = journals[:1]
+    wanted = {
+        'name': 'Payment Portal Express',
+        # 'none' is deliberate: Odoo cannot and should not process a payment
+        # through this provider. It exists so a saved card has a home.
+        'code': 'none',
+        'company_id': company.id,
+        'allow_tokenization': True,
+        # Publishing it would offer it on Odoo's own checkout, where choosing
+        # it would do nothing.
+        'is_published': False,
+        'journal_id': bank_journal.id if bank_journal else False,
+    }
+    # Field names differ between Odoo versions, so send only what this one has
+    # rather than failing on a field that was renamed.
+    available = env['payment.provider'].fields_get().keys()
+    env['payment.provider'].create({k: v for k, v in wanted.items() if k in available})
+    notes.append("%s: card storage created" % company.name)
+
+action = {
+    'type': 'ir.actions.client',
+    'tag': 'display_notification',
+    'params': {
+        'title': 'Payment Portal Express',
+        'message': "\n".join(notes) if notes else "Nothing left to do.",
+        'type': 'success',
+        'sticky': True,
+    },
+}
+]]></field>
+    </record>
+
+  </data>
+</odoo>

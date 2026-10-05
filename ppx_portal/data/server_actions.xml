@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+    <!--
+      "Pay via Portal" on an invoice.
+
+      Opens THIS invoice in the portal, which then shows every open invoice for
+      the same customer with this one already selected.
+
+      The link carries the invoice's portal access token. Odoo creates those
+      lazily, so most invoices have none until something asks for one;
+      _portal_ensure_token() both creates and returns it. The token is what
+      proves to the portal that the holder may see this customer's billing, so
+      no password or login is needed on the customer's side.
+    -->
+    <record id="action_pay_invoice" model="ir.actions.server">
+      <field name="name">Pay via Portal</field>
+      <field name="model_id" ref="account.model_account_move"/>
+      <field name="binding_model_id" ref="account.model_account_move"/>
+      <field name="binding_view_types">list,form</field>
+      <field name="state">code</field>
+      <field name="code"><![CDATA[
+slug = env['ir.config_parameter'].sudo().get_param('ppx.tenant_slug', '')
+host = env['ir.config_parameter'].sudo().get_param('ppx.portal_host', 'paymentportalexpress.com')
+environment = env['ir.config_parameter'].sudo().get_param('ppx.environment', 'production')
+
+if not slug:
+    raise UserError(
+        "Payment Portal Express is not configured yet.\n\n"
+        "Settings > Payment Portal Express: fill in the account name from your "
+        "portal's Accounts page."
+    )
+
+inv = records[:1]
+if not inv:
+    raise UserError("Select an invoice first.")
+if inv.move_type != 'out_invoice' or inv.state != 'posted':
+    raise UserError("Only posted customer invoices can be paid through the portal.")
+
+token = inv._portal_ensure_token()
+
+action = {
+    'type': 'ir.actions.act_url',
+    'url': 'https://%s/pay/odoo/%s?ref=%s&env=%s' % (host, slug, token, environment),
+    'target': 'new',
+}
+]]></field>
+    </record>
+
+    <!--
+      "Pay via Portal" on a customer.
+
+      Same destination, reached from the customer rather than one invoice. The
+      portal lists all their open invoices.
+
+      Why this borrows an invoice's token: res.partner has no access token of
+      its own (only models inheriting portal.mixin do), so there is no
+      customer-level secret to authenticate with, and minting one would mean
+      putting a signing key inside Odoo where any administrator could read it.
+      An invoice's token already proves the holder may see this customer's
+      billing, and the portal lists every open invoice for the customer
+      whichever one identified them.
+    -->
+    <record id="action_pay_customer" model="ir.actions.server">
+      <field name="name">Pay via Portal</field>
+      <field name="model_id" ref="base.model_res_partner"/>
+      <field name="binding_model_id" ref="base.model_res_partner"/>
+      <field name="binding_view_types">list,form</field>
+      <field name="state">code</field>
+      <field name="code"><![CDATA[
+slug = env['ir.config_parameter'].sudo().get_param('ppx.tenant_slug', '')
+host = env['ir.config_parameter'].sudo().get_param('ppx.portal_host', 'paymentportalexpress.com')
+environment = env['ir.config_parameter'].sudo().get_param('ppx.environment', 'production')
+
+if not slug:
+    raise UserError(
+        "Payment Portal Express is not configured yet.\n\n"
+        "Settings > Payment Portal Express: fill in the account name from your "
+        "portal's Accounts page."
+    )
+
+partner = records[:1]
+if not partner:
+    raise UserError("Select a customer first.")
+
+# Deliberately not filtered on payment status. The portal's own lookup does not
+# require the invoice to still be open, so any posted invoice works -- which
+# means the button still opens for a customer who has paid everything, landing
+# them on their receipts rather than an error. A button that dead-ends for
+# fully-paid customers is one people stop trusting.
+#
+# Newest first: most likely to have a token already, and most likely to survive
+# any pruning of old records. Scoped to the company being viewed, because Odoo
+# reuses invoice numbers across companies and keeps their ledgers apart.
+inv = env['account.move'].search([
+    ('partner_id', 'child_of', partner.id),
+    ('move_type', '=', 'out_invoice'),
+    ('state', '=', 'posted'),
+    ('company_id', '=', env.company.id),
+], order='id desc', limit=1)
+
+if not inv:
+    raise UserError("This customer has no posted invoices yet.")
+
+token = inv._portal_ensure_token()
+
+action = {
+    'type': 'ir.actions.act_url',
+    'url': 'https://%s/pay/odoo/%s?ref=%s&env=%s' % (host, slug, token, environment),
+    'target': 'new',
+}
+]]></field>
+    </record>
+
+  </data>
+</odoo>

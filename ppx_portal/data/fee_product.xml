@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!--
+    The product a convenience fee is billed as, when the account charges one.
+    The portal raises a separate invoice for the fee and this is the line on it.
+
+    No taxes: the portal charges a percentage of the invoice and bills exactly
+    that amount, so a tax on the line would make the fee invoice total more than
+    the card was charged and the payment would not tie out. If fees are taxable
+    for your business, the percentage has to be treated as tax-inclusive, which
+    is a decision for your accountant.
+
+    No company either, so that every company in a multi-company database can
+    bill against it.
+
+    noupdate="1": rename it, re-price it or change its accounts freely, and a
+    module upgrade will leave your version alone.
+  -->
+  <data noupdate="1">
+    <record id="product_credit_card_fee" model="product.product">
+      <field name="name">Credit Card Fee</field>
+      <field name="type">service</field>
+      <field name="sale_ok" eval="True"/>
+      <field name="purchase_ok" eval="False"/>
+      <field name="list_price">0</field>
+      <field name="taxes_id" eval="[(6, 0, [])]"/>
+      <field name="company_id" eval="False"/>
+    </record>
+  </data>
+</odoo>

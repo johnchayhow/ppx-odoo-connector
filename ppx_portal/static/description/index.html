@@ -1,0 +1,92 @@
+<section class="oe_container">
+  <div class="oe_row oe_spaced">
+    <h2 class="oe_slogan">Payment Portal Express</h2>
+    <h3 class="oe_slogan">Let your customers pay their invoices online, by card or bank transfer</h3>
+    <div class="oe_span12">
+      <p class="oe_mt32 text-center">
+        Adds a <b>Pay via Portal</b> button to customer invoices and to customers.
+        One click opens that invoice in your Payment Portal Express account, where
+        your customer pays without needing an Odoo login or a password.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container oe_dark">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span6">
+      <h3 class="oe_slogan">Paid invoices close themselves</h3>
+      <p class="oe_mt32">
+        The payment is written back to Odoo against the invoice, reconciled through
+        your bank journal's Outstanding Receipts account. Nobody keys it in twice,
+        and the invoice stops chasing the customer the moment it is paid.
+      </p>
+    </div>
+    <div class="oe_span6">
+      <h3 class="oe_slogan">Card or bank transfer</h3>
+      <p class="oe_mt32">
+        Customers can pay by card, or by bank account where your processor supports
+        it. If you charge a convenience fee on card payments, it is raised as its
+        own invoice line using the Credit Card Fee product, so your ledger ties out.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span6">
+      <h3 class="oe_slogan">Card details never touch Odoo</h3>
+      <p class="oe_mt32">
+        Card entry happens on the payment processor's own hosted fields, and only a
+        reference comes back. No card number, security code or bank account number
+        passes through this module, your Odoo database or our servers.
+      </p>
+    </div>
+    <div class="oe_span6">
+      <h3 class="oe_slogan">Works on Odoo Online</h3>
+      <p class="oe_mt32">
+        This is a data module: no custom Python. It installs on Odoo Online,
+        Odoo.sh and on-premise alike.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container oe_dark">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12">
+      <h3 class="oe_slogan">Setting it up</h3>
+      <ol class="oe_mt32">
+        <li>Install the module.</li>
+        <li>Open <b>Settings &gt; Payment Portal Express &gt; Settings</b> and enter your
+          account name, exactly as it appears on the Accounts page of your portal admin.</li>
+        <li>Run <b>Settings &gt; Payment Portal Express &gt; Finish setup</b> once. It sets the
+          Outstanding Receipts account on your bank journals and creates a place for
+          saved cards to live.</li>
+        <li>Open a posted customer invoice and click <b>Pay via Portal</b>.</li>
+      </ol>
+      <p>
+        A Payment Portal Express account is required. See
+        <a href="https://paymentportalexpress.com">paymentportalexpress.com</a>.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12">
+      <h3 class="oe_slogan">What it sends us</h3>
+      <p class="oe_mt32">
+        When someone clicks the button, the link carries the invoice's Odoo portal
+        access token. Our portal uses it to read that customer's open invoices from
+        your Odoo, so it can show what is owed and write the payment back. Nothing
+        else is collected, and nothing is sent anywhere until the button is clicked.
+      </p>
+      <p>
+        Support: <a href="mailto:support@paymentportalexpress.com">support@paymentportalexpress.com</a>
+      </p>
+    </div>
+  </div>
+</section>
