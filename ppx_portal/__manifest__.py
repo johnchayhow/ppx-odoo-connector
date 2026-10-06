@@ -10,7 +10,7 @@
 # the rest. Card details never touch Odoo.
 {
     'name': 'Payment Portal Express',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'summary': 'Pay invoices online: a Pay via Portal button on invoices and customers',
     'description': """
 Payment Portal Express

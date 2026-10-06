@@ -25,6 +25,12 @@ One branch per Odoo version, which is what the Odoo Apps Store expects:
 | Branch | Odoo |
 |---|---|
 | `19.0` | 19.0 and saas~19.x |
+| `20.0` | 20.0 and saas~20.x |
+
+The branches differ only in the `version` key of the manifest. Odoo refuses a
+module whose version series does not match the server it is being installed
+on ("incompatible version, setting installable=False"), so the same code is
+tagged per series.
 
 ## Installing
 
