@@ -34,9 +34,26 @@ What this module adds
   configuration the portal needs.
 
 No card data is stored in or passes through Odoo.
+
+Data this app sends outside Odoo
+--------------------------------
+
+When someone clicks **Pay via Portal**, the link carries that invoice's Odoo
+portal access token to Payment Portal Express. The portal uses it to read the
+customer's open invoices from this Odoo database, so it can show what is owed
+and write the payment back against the invoice. Customer name, billing address,
+invoice numbers and amounts are involved, because that is what an invoice is.
+
+Nothing is sent until the button is clicked, and nothing else is collected.
+Card numbers, security codes and bank account numbers are entered on the
+payment processor's own hosted fields and never reach this module, your Odoo
+database, or Payment Portal Express.
+
+Privacy policy: https://www.paymentportalexpress.com/privacy
 """,
     'author': 'Payment Portal Express',
     'website': 'https://paymentportalexpress.com',
+    'privacy_policy': 'https://www.paymentportalexpress.com/privacy',
     'support': 'support@paymentportalexpress.com',
     'category': 'Accounting/Payment',
     'license': 'LGPL-3',
@@ -51,5 +68,5 @@ No card data is stored in or passes through Odoo.
     ],
     'images': ['static/description/banner.png'],
     'installable': True,
-    'application': False,
+    'application': True,
 }
