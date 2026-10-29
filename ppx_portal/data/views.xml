@@ -12,6 +12,11 @@
 
       The invoice button hides itself unless the record is a posted customer
       invoice, so it never appears somewhere it would only produce an error.
+
+      Both carry a confirm dialog. Odoo's vendor guidelines require an opt in
+      inside the application before data leaves the database, and clicking one
+      of these sends the record's portal access token to Payment Portal
+      Express. The dialog is the opt in, and says what travels.
     -->
 
     <record id="view_move_form_ppx_button" model="ir.ui.view">
@@ -24,6 +29,7 @@
                   string="Pay via Portal"
                   type="action"
                   class="btn-secondary"
+                  confirm="This opens the invoice in Payment Portal Express. The link carries this invoice's portal access token, so the portal can read this customer's open invoices and write the payment back here. Card details are entered on the payment processor's own page and never reach Odoo."
                   invisible="state != 'posted' or move_type != 'out_invoice'"/>
         </xpath>
       </field>
@@ -45,6 +51,7 @@
                     string="Pay via Portal"
                     type="action"
                     class="btn-secondary"
+                    confirm="This opens this customer's open invoices in Payment Portal Express. The link carries their portal access token, so the portal can read those invoices and write payments back here. Card details are entered on the payment processor's own page and never reach Odoo."
                     invisible="not customer_rank"/>
           </header>
         </xpath>
